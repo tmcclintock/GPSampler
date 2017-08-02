@@ -10,25 +10,30 @@ class GPSampler(object):
         """
         import lhsmdu
         dim = len(self.params)
+        print "here"
         self.LHC = np.array(lhsmdu.sample(dim, N)).T
+        print "now here"
 
     def evaluate_func(self):
-        print self.LHC.shape
-        print type(self.LHC[0])
         self.Y = np.array([self.func(np.array(x)) for x in self.LHC])
 
 if __name__ == "__main__":
     #Let's say we have some log-likelihood function
     def llike(x):
-        return np.exp(-(x-0.5)**2/0.05)
+        return np.exp(-np.sum((x-0.5)**2)/0.05)
 
-    gps = GPSampler(llike, [[0,1]])
+    gps = GPSampler(llike, [[0,1],[0,1]])
     gps.create_LH()
-    print "here"
     gps.evaluate_func()
 
     import matplotlib.pyplot as plt
-    x = np.linspace(0, 1, 50)
-    plt.plot(x, llike(x), c='k')
-    plt.scatter(gps.LHC, gps.Y, c='b')
+    #x = np.linspace(0, 1, 50)
+    #plt.plot(x, [llike(xi) for xi in x], c='k')
+    print gps.LHC.shape
+    print gps.Y.shape
+    #plt.scatter(gps.LHC[:,0], gps.Y, c='b')
+    from mpl_toolkits.mplot3d import Axes3D
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(gps.LHC[:,0], gps.LHC[:,1], gps.Y)
     plt.show()
